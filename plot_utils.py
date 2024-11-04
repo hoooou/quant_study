@@ -171,7 +171,7 @@ def printResult(df: DataFrame):
     new_order = [5, 10, 11,25,28,32,34]+[i for i in new_order if i not in [5, 10, 11,25,28,32,34]]
     df_reordered = df.iloc[new_order]
     return df_reordered
-def plotMy(stock_name,dataframe):
+def plotStock(stock_name,dataframe):
     print(stock_name)
     # 新增需要的列
     # 检查并新增需要的列
@@ -234,6 +234,19 @@ def plotMy(stock_name,dataframe):
     fig.show()
 def plotChart(result):
     import matplotlib.pyplot as plt
-    result.portfolio['syl']=result.portfolio['market_value']/result.portfolio.iloc[0]["cash"]-1
+    result.portfolio['syl']=(result.portfolio['market_value']/result.portfolio.iloc[0]["cash"]-1)*100
     chart = plt.subplot2grid((3, 2), (0, 0), rowspan=3, colspan=2)
     chart.plot(result.portfolio.index, result.portfolio['syl'])
+def oneKeyPlot(stock_code,start_date,end_date):
+    import akshare as ak
+    import pandas as pd
+    import plot_utils as plotUtils
+    import data_utils as dataUtils
+    # 获取历史股票数据
+    stock_zh_a_hist_df = ak.stock_zh_a_hist(symbol=stock_code, period="daily", start_date=start_date, end_date=end_date, adjust="hfq")
+    stock_zh_a_hist_df['日期'] = pd.to_datetime(stock_zh_a_hist_df['日期'])
+    stock_zh_a_hist_df = stock_zh_a_hist_df.set_index('日期')
+    stock_info=dataUtils.getStockInfo(stock_code=stock_code)
+    # print(stock_zh_a_hist_df)
+    # 获取指定股票的详细信息
+    plotUtils.plotStock(stock_info["股票简称"].value,stock_zh_a_hist_df)
